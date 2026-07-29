@@ -1,37 +1,25 @@
-from pydantic import BaseModel, EmailStr
-
-# class SubjectChoice(Enum):
-#     PYTHON="Python"
-#     JAVA="Java"
-#     C = "C"
-#     MATHEMATICS="Mathematics"
-#     DATABASE = "Database"
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
-class Subjects(BaseModel):
-    name: str
-    mark: int
-
-    # @field_validator("name", mode="before")
-    # @classmethod
-    # def title_case(cls, value):
-    #     if isinstance(value, str):
-    #         return value.title()
-    #     return value
-
-
-class StudentBase(BaseModel):
+class StudentCreate(BaseModel):
     name: str
     age: int
     email: EmailStr
     cgpa: float
-    is_active: bool
-    subjects: list[Subjects] = []
 
 
-class CreateStudent(StudentBase):
-    pass
-
-
-class StudentWithID(StudentBase):
+class StudentResponse(StudentCreate):
     id: int
+    status: bool
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserResponse(BaseModel):
+    id: int
+    email: EmailStr
+    model_config = ConfigDict(from_attributes=True)
