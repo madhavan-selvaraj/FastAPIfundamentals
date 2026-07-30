@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from .database import Base, engine
-from .routers import student, user
+from .routers import student, user, auth
 
 Base.metadata.create_all(bind=engine)
 
@@ -15,3 +15,4 @@ def home():
 
 app.include_router(student.router)
 app.include_router(user.router)
+app.include_router(auth.router)

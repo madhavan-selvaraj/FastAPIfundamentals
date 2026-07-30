@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from .. import models, schemas
+from .. import models, oauth2, schemas
 from ..database import get_db
 
-router = APIRouter()
+router = APIRouter(tags=["Student"])
 
 
 @router.get(
@@ -22,7 +22,11 @@ def get_students(db: Session = Depends(get_db)):
     response_model=schemas.StudentResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def add_student(student: schemas.StudentCreate, db: Session = Depends(get_db)):
+def add_student(
+    student: schemas.StudentCreate,
+    db: Session = Depends(get_db),
+    user_email: str = Depends(oauth2.get_current_user),
+):
     new_student = models.Student(**student.model_dump())
     db.add(new_student)
     db.commit()
@@ -45,7 +49,11 @@ def get_student(id: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/students/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_student(id: int, db: Session = Depends(get_db)):
+def delete_student(
+    id: int,
+    db: Session = Depends(get_db),
+    user_email: str = Depends(oauth2.get_current_user),
+):
     student = db.query(models.Student).filter(models.Student.id == id).first()
     if not student:
         raise HTTPException(
@@ -61,7 +69,10 @@ def delete_student(id: int, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,
 )
 def update_student(
-    id: int, Updated_student: schemas.StudentCreate, db: Session = Depends(get_db)
+    id: int,
+    Updated_student: schemas.StudentCreate,
+    db: Session = Depends(get_db),
+    user_email: str = Depends(oauth2.get_current_user),
 ):
     student_queryy = db.query(models.Student).filter(models.Student.id == id)
     student = student_queryy.first()
